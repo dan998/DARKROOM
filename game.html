@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HUNTED – Level One</title>
+  <link rel="stylesheet" href="level1.css">
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="fog"></div>
+
+<div class="room">
+  <h1>LEVEL ONE</h1>
+
+  <p id="story">
+    Stone remembers every soul.<br>
+    Symbols were carved by the fallen.<br>
+    One was never meant to be followed.
+  </p>
+
+  <button onclick="inspect()">Inspect Room</button>
+
+  <div id="clues"></div>
+
+  <div class="slots">
+    <div class="slot" id="slot0">?</div>
+    <div class="slot" id="slot1">?</div>
+    <div class="slot" id="slot2">?</div>
+  </div>
+
+  <div class="symbols">
+    <button onclick="pick('☪️')">☪️</button>
+    <button onclick="pick('✡️')">✡️</button>
+    <button onclick="pick('☯️')">☯️</button>
+    <button onclick="pick('🕎')">🕎</button>
+  </div>
+
+  <button onclick="check()">Touch the Door</button>
+
+  <p id="result"></p>
+</div>
+
+<!-- Sounds -->
+<audio id="ambience" src="audio/scary-horror-sound-189949.mp3" loop></audio>
+<audio id="rotate" src="audio/slot_rotate.mp3"></audio>
+<audio id="doorCreak" src="audio/door_creak.mp3"></audio>
+<audio id="doorJump" src="audio/door_jump.mp3"></audio>
+<audio id="whisper" src="audio/whisper.mp3"></audio>
+<audio id="wrongClick" src="audio/wrong_move.mp3"></audio>
+
+<script src="level1.js"></script>
+</body>
+</html>

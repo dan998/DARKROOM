@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HUNTED</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- AUDIO -->
+  <audio id="ambience" src="audio/840338__imp_sounds__horror-scary-soundtrack.mp3" loop preload="auto"></audio>
+  <audio id="whisper" src="audio/420389__mirolog_lodger__door_noise.mp3" preload="auto"></audio>
+
+  <!-- OVERLAY -->
+  <div class="overlay"></div>
+
+  <!-- HAUNTED IMAGE FLASH -->
+  <div class="haunted-images">
+    <img src="images/room1.jpg" alt="">
+    <img src="images/room2.jpg" alt="">
+    <img src="images/room3.jpg" alt="">
+  </div>
+
+  <!-- LANDING SCREEN -->
+  <div class="screen landing active">
+    <h1 data-text="HUNTED">HUNTED</h1>
+    <p>You are not alone.<br>Silence will not save you.</p>
+    <button onclick="startGame()">ENTER</button>
+  </div>
+
+  <!-- LOADER SCREEN -->
+  <div class="screen loader">
+    <p>Loading memories...</p>
+
+    <div class="bar-container">
+      <div class="bar-fill"></div>
+      <div class="blood"></div>
+    </div>
+
+    <span id="percent">0%</span>
+  </div>
+
+  <!-- MAIN JS -->
+  <script src="main.js"></script>
+
+</body>
+</html>
