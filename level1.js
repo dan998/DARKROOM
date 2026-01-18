@@ -1,7 +1,7 @@
 let inspected = false;
 let solved = false;
 
-const symbols = ["☪️","✡️","☯️","🕎"];
+const symbols = ["","","",""];
 const hints = [
   "Faith blinded them; shadows fell in 1147.",
   "Knowledge invited hunters; scholars vanished in 1349.",

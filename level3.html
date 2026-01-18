@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HUNTED – Level Three</title>
+  <link rel="stylesheet" href="level3.css">
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="overlay"></div>
+
+<div class="level">
+  <h1>LEVEL THREE</h1>
+
+  <p id="story">
+    The chamber echoes with lies.<br>
+    Your eyes will betray you.<br>
+    Listen. Do not touch yet.
+  </p>
+
+  <!-- False Vision -->
+  <div id="illusion" class="illusion"></div>
+
+  <!-- Symbol Choices -->
+  <div class="symbols">
+    <button onclick="choose('☪️')">☪️</button>
+    <button onclick="choose('✡️')">✡️</button>
+    <button onclick="choose('☯️')">☯️</button>
+    <button onclick="choose('🕎')">🕎</button>
+  </div>
+
+  <p id="result" class="result"></p>
+</div>
+
+<!-- Sounds -->
+<audio id="ambience" src="sounds/level3_ambience.mp3" loop></audio>
+<audio id="whisper1" src="sounds/whisper1.mp3"></audio>
+<audio id="whisper2" src="sounds/whisper2.mp3"></audio>
+<audio id="whisper3" src="sounds/whisper3.mp3"></audio>
+<audio id="fail" src="sounds/fail.mp3"></audio>
+
+<script src="level3.js"></script>
+</body>
+</html>

@@ -7,20 +7,24 @@
 </head>
 <body>
 
+<!-- Background -->
+<div class="bg"></div>
 <div class="overlay"></div>
 
 <div class="level">
+
   <h1>LEVEL TWO</h1>
 
   <p id="story">
-    The corridor judges memory.<br>
-    What you touch cannot be touched again.
+    This hall remembers witnesses.<br>
+    It will show you the truth once.<br>
+    Touch wisely. Repetition is punished.
   </p>
 
-  <!-- Vision -->
+  <!-- Vision Wall -->
   <div id="vision" class="vision"></div>
 
-  <!-- Symbol Hall -->
+  <!-- Symbol Choices -->
   <div class="hall">
     <button class="symbol" onclick="choose('☪️')">☪️</button>
     <button class="symbol" onclick="choose('✡️')">✡️</button>
@@ -29,7 +33,14 @@
   </div>
 
   <p id="result" class="result"></p>
+
 </div>
+
+<!-- Sounds -->
+<audio id="ambience" src="sounds/level2_ambience.mp3" loop></audio>
+<audio id="whisper" src="sounds/whisper.mp3"></audio>
+<audio id="click" src="sounds/click.mp3"></audio>
+<audio id="fail" src="sounds/fail.mp3"></audio>
 
 <script src="level2.js"></script>
 </body>

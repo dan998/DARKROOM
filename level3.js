@@ -1,96 +1,113 @@
 const symbols = ["☪️","✡️","☯️","🕎"];
 
-let sequence = [];
+let trueSequence = [];
 let progress = 0;
 let used = new Set();
+let listening = true;
 
 /* Sounds */
 const ambience = document.getElementById("ambience");
-const whisper = document.getElementById("whisper");
-const clickSound = document.getElementById("click");
+const whispers = [
+  document.getElementById("whisper1"),
+  document.getElementById("whisper2"),
+  document.getElementById("whisper3")
+];
 const failSound = document.getElementById("fail");
 
 /* Start ambience */
 ambience.volume = 0.5;
 ambience.play();
 
-/* Generate non-repeating sequence */
+/* Generate real sequence */
 function generateSequence(){
-  sequence = [...symbols].sort(()=>0.5-Math.random()).slice(0,3);
+  trueSequence = [...symbols].sort(()=>0.5-Math.random()).slice(0,3);
 }
 
-/* Show wall vision once */
-function showVision(){
-  const vision = document.getElementById("vision");
-  vision.textContent = sequence.join(" ");
-  vision.style.opacity = 1;
-  whisper.play();
-
-  setTimeout(()=>{
-    vision.style.opacity = 0;
-  },2200);
+/* Fake visual illusion */
+function startIllusion(){
+  const illusion = document.getElementById("illusion");
+  setInterval(()=>{
+    illusion.textContent =
+      symbols.sort(()=>0.5-Math.random()).slice(0,3).join(" ");
+  },350);
 }
 
-/* Choose symbol */
+/* Play whisper sequence */
+function playWhispers(){
+  let i = 0;
+  function playNext(){
+    if(i >= trueSequence.length){
+      listening = false;
+      document.getElementById("result").textContent =
+        "The echoes fade. Now choose.";
+      return;
+    }
+    whispers[i].play();
+    i++;
+    setTimeout(playNext,1400);
+  }
+  playNext();
+}
+
+/* Player choice */
 function choose(symbol){
-  clickSound.currentTime = 0;
-  clickSound.play();
-
-  const result = document.getElementById("result");
-
-  if(used.has(symbol)){
-    result.textContent = "The hall recoils from repetition.";
+  if(listening){
+    fail("You touched too early.");
     return;
   }
 
-  if(symbol === sequence[progress]){
+  if(used.has(symbol)){
+    fail("The chamber rejects repetition.");
+    return;
+  }
+
+  if(symbol === trueSequence[progress]){
     used.add(symbol);
     progress++;
     markUsed(symbol);
 
-    if(progress === sequence.length){
+    if(progress === trueSequence.length){
       win();
     }
   } else {
-    fail();
+    fail("The echo screams wrong.");
   }
 }
 
 /* Mark used */
 function markUsed(symbol){
-  document.querySelectorAll(".symbol").forEach(btn=>{
+  document.querySelectorAll("button").forEach(btn=>{
     if(btn.textContent === symbol){
       btn.classList.add("used");
     }
   });
 }
 
-/* Failure */
-function fail(){
+/* Fail */
+function fail(msg){
   failSound.play();
   document.body.classList.add("shake");
-  document.getElementById("result").textContent =
-    "Wrong. The witnesses turn away.";
+  document.getElementById("result").textContent = msg;
 
   setTimeout(()=>{
     document.body.classList.remove("shake");
     reset();
-  },700);
+  },800);
 }
 
-/* Reset level */
+/* Reset */
 function reset(){
   progress = 0;
   used.clear();
-  document.querySelectorAll(".symbol").forEach(b=>b.classList.remove("used"));
-  showVision();
+  listening = true;
+  document.querySelectorAll("button").forEach(b=>b.classList.remove("used"));
+  playWhispers();
 }
 
-/* Win + Loading */
+/* Win */
 function win(){
   document.getElementById("result").innerHTML =
-    "The hall opens.<br><strong>You may pass.</strong>";
-
+    "The chamber falls silent.<br><strong>You endured.</strong>";
   setTimeout(showLoader,1200);
 }
 
@@ -104,9 +121,9 @@ function showLoader(){
   loader.style.flexDirection="column";
   loader.style.justifyContent="center";
   loader.style.alignItems="center";
-  loader.style.color="#b30000";
+  loader.style.color="#8b0000";
   loader.innerHTML=`
-    <p>Judging memory...</p>
+    <p>Echoes judging...</p>
     <div style="width:300px;height:10px;border:1px solid #550000;margin:15px;">
       <div id="bar" style="height:100%;width:0;background:#8b0000;"></div>
     </div>
@@ -119,17 +136,18 @@ function showLoader(){
   const percent = loader.querySelector("#percent");
 
   const interval = setInterval(()=>{
-    p += Math.floor(Math.random()*8)+4;
+    p += Math.floor(Math.random()*7)+5;
     if(p>=100) p=100;
     bar.style.width = p+"%";
     percent.textContent = p+"%";
     if(p===100){
       clearInterval(interval);
-      window.location.href="level3.html";
+      window.location.href="level4.html";
     }
   },300);
 }
 
 /* Init */
 generateSequence();
-setTimeout(showVision,800);
+startIllusion();
+setTimeout(playWhispers,1000);
