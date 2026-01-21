@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HUNTED — Coming Soon</title>
+
+<style>
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Courier New", monospace;
+}
+
+body {
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+  color: #cfcfcf;
+}
+
+/* ================= BACKGROUND ================= */
+.bg {
+  position: fixed;
+  inset: 0;
+  background: url("images/room.jpg") center/cover no-repeat;
+  filter: brightness(0.35);
+  z-index: 0;
+}
+
+/* ================= SMOKE ================= */
+.smoke {
+  position: fixed;
+  bottom: -120px;
+  left: 0;
+  width: 100%;
+  height: 70%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.smoke span {
+  position: absolute;
+  bottom: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle,
+    rgba(200,200,200,0.18) 0%,
+    rgba(200,200,200,0.08) 40%,
+    transparent 70%);
+  border-radius: 50%;
+  animation: riseSmoke linear infinite;
+  opacity: 0;
+  filter: blur(14px);
+}
+
+.smoke span:nth-child(1) { left: 5%;  animation-duration: 22s; }
+.smoke span:nth-child(2) { left: 25%; animation-duration: 18s; animation-delay: 4s; }
+.smoke span:nth-child(3) { left: 45%; animation-duration: 26s; animation-delay: 8s; }
+.smoke span:nth-child(4) { left: 65%; animation-duration: 20s; animation-delay: 2s; }
+.smoke span:nth-child(5) { left: 85%; animation-duration: 24s; animation-delay: 6s; }
+
+@keyframes riseSmoke {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  15% { opacity: 0.35; }
+  60% { opacity: 0.2; }
+  100% { transform: translateY(-700px) scale(1.4); opacity: 0; }
+}
+
+/* ================= CONTENT ================= */
+.container {
+  position: relative;
+  z-index: 3;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  color: #8b0000;
+  font-size: 3.2rem;
+  letter-spacing: 10px;
+  text-shadow: 0 0 25px black;
+  animation: flicker 2.5s infinite;
+}
+
+@keyframes flicker {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+p {
+  max-width: 520px;
+  margin-top: 20px;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+.notice {
+  margin-top: 30px;
+  font-size: 1.1rem;
+  color: #b30000;
+  text-shadow: 0 0 10px black;
+}
+
+/* ================= BUTTON ================= */
+button {
+  margin-top: 25px;
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  background: black;
+  border: 1px solid #550000;
+  color: #ccc;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  color: red;
+  box-shadow: 0 0 20px red;
+}
+
+/* ================= FOOTER ================= */
+.footer {
+  position: absolute;
+  bottom: 20px;
+  font-size: 0.85rem;
+  opacity: 0.4;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Background -->
+<div class="bg"></div>
+
+<!-- Smoke -->
+<div class="smoke">
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<!-- Content -->
+<div class="container">
+  <h1>COMING SOON</h1>
+
+  <p>
+    The path ahead is sealed.<br>
+    What waits beyond is not ready to be remembered.<br>
+    Return when the silence calls you.
+  </p>
+
+  <div class="notice">
+    NEXT CHAPTER UNLOCKING
+  </div>
+
+  <button onclick="window.location.href='level.html'">Return to Hub</button>
+
+  <div class="footer">
+    HUNTED ©
+  </div>
+</div>
+
+</body>
+</html>
