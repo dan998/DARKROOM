@@ -1,0 +1,119 @@
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Courier New", monospace;
+}
+
+body {
+  height:100vh;
+  background:black;
+  overflow:hidden;
+  color:#cfcfcf;
+}
+
+.bg {
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at center, #1a0000, #000);
+}
+
+.fog {
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,0.02);
+  animation:fogMove 20s infinite linear;
+}
+
+@keyframes fogMove {
+  from {background-position:0 0;}
+  to {background-position:100% 100%;}
+}
+
+.room {
+  position:relative;
+  z-index:2;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  gap:15px;
+}
+
+h1 {
+  color:#8b0000;
+  letter-spacing:8px;
+  text-shadow:0 0 20px black;
+}
+
+#story {
+  max-width:500px;
+  opacity:0.85;
+}
+
+button {
+  padding:10px 20px;
+  background:black;
+  border:1px solid #550000;
+  color:#ccc;
+  cursor:pointer;
+}
+
+button:hover {
+  box-shadow:0 0 15px red;
+}
+
+.wall {
+  font-size:2.5rem;
+  letter-spacing:25px;
+  color:red;
+  text-shadow:0 0 20px darkred;
+}
+
+.hidden {
+  display:none;
+}
+
+.slots {
+  display:flex;
+  gap:15px;
+}
+
+.slot {
+  width:60px;
+  height:60px;
+  border:1px solid #550000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:2rem;
+}
+
+.symbols {
+  display:flex;
+  gap:15px;
+}
+
+.loader {
+  margin-top:20px;
+}
+
+.bar {
+  width:250px;
+  height:10px;
+  border:1px solid #550000;
+}
+
+.fill {
+  height:100%;
+  width:0%;
+  background:red;
+}
+
+#percent {
+  display:block;
+  margin-top:5px;
+  color:#b30000;
+}

@@ -1,114 +1,233 @@
+// =======================
+// LEVEL 1 — HAUNTED PUZZLE
+// =======================
+
+// GAME STATE
 let inspected = false;
 let solved = false;
+let startTime = Date.now();
+let hintCorruption = 0;
 
-const symbols = ["","","",""];
-const hints = [
-  "Faith blinded them; shadows fell in 1147.",
-  "Knowledge invited hunters; scholars vanished in 1349.",
-  "Balance was a lie; harmony betrayed souls in 1620.",
-  "The flame revealed souls; darkness consumed the unworthy in 1793."
-];
-
+// Symbols
+const symbols = ["☪️", "✡️", "☯️", "🕎"];
 let chosen = [];
 let correctOrder = [];
-let userSlots = ["","",""];
+let slotIndex = [0, 0, 0];
 
-// Sounds
-const ambience = document.getElementById("ambience");
-const rotateSound = document.getElementById("rotate");
-const doorCreak = document.getElementById("doorCreak");
-const doorJump = document.getElementById("doorJump");
-const whisper = document.getElementById("whisper");
-const wrongClick = document.getElementById("wrongClick");
+// =======================
+// HINT SYSTEM
+// =======================
+const hintTemplates = [
+  (order) => `
+    Scratched into the wall, left to right:<br><br>
+    <strong style="letter-spacing:15px;color:#b30000;font-size:1.3rem;">
+      ${order.join(" ")}
+    </strong><br><br>
+    <span style="color:#777">The wall feels cold.</span>
+  `,
+  (order) => `
+    Beneath old blood stains, symbols repeat:<br><br>
+    <strong style="letter-spacing:15px;color:#8b0000;font-size:1.3rem;">
+      ${order.join(" ")}
+    </strong><br><br>
+    <span style="color:#666">Some marks look newer than others.</span>
+  `,
+  (order) => `
+    The pattern is etched deeply, as if clawed:<br><br>
+    <strong style="letter-spacing:15px;color:#b30000;font-size:1.3rem;">
+      ${order.join(" ")}
+    </strong><br><br>
+    <span style="color:#555">Do not trust movement.</span>
+  `
+];
 
-function inspect(){
-  inspected = true;
-
-  if(ambience) { ambience.volume=0.5; ambience.play(); }
-  if(whisper) { whisper.volume=0.4; whisper.play(); }
-
-  // Pick 3 symbols randomly for puzzle
-  chosen = symbols.sort(()=>0.5-Math.random()).slice(0,3);
-  correctOrder = [...chosen];
-
-  // Random hints
-  let shuffledHints = hints.sort(()=>0.5-Math.random()).slice(0,3);
-  let hintHTML = "";
-  chosen.forEach((s,i)=> hintHTML += `<strong>${s}</strong> — ${shuffledHints[i]}<br>`);
-  document.getElementById("clues").innerHTML = hintHTML;
-
-  // Reset slots
-  document.querySelectorAll(".slot").forEach((el)=> el.textContent="?");
-  userSlots = ["","",""];
-  document.getElementById("result").textContent = "Select the symbols in order. Do not repeat symbols!";
+// Corrupt hint after mistakes
+function corruptOrder(order) {
+  if (hintCorruption < 1) return order;
+  return [...order].sort(() => Math.random() - 0.5);
 }
 
-function pick(sym){
-  if(solved) return;
+// Show hint temporarily
+function showHint(duration = 3000) {
+  const template = hintTemplates[Math.floor(Math.random() * hintTemplates.length)];
+  const visibleOrder =
+    Math.random() < hintCorruption * 0.25 ? corruptOrder(correctOrder) : correctOrder;
 
-  if(userSlots.includes(sym)){
-    if(wrongClick){ wrongClick.currentTime=0; wrongClick.play(); }
-    document.getElementById("result").textContent = "You cannot pick the same symbol twice!";
-    return;
+  const storyEl = document.getElementById("story");
+
+  if (window.memory && typeof memory.getAdaptiveHint === "function") {
+    storyEl.innerHTML = memory.getAdaptiveHint(template(visibleOrder), { corruption: hintCorruption });
+  } else {
+    storyEl.innerHTML = template(visibleOrder);
   }
 
-  for(let i=0;i<3;i++){
-    if(userSlots[i]===""){
-      userSlots[i]=sym;
-      document.getElementById("slot"+i).textContent=sym;
-      if(rotateSound){ rotateSound.currentTime=0; rotateSound.play(); }
-      break;
+  // Remove hint after duration
+  setTimeout(() => {
+    storyEl.innerHTML = "";
+  }, duration);
+}
+
+// =======================
+// SYMBOL RESHUFFLE
+// =======================
+function reshuffleSymbols() {
+  chosen = [...chosen].sort(() => 0.5 - Math.random());
+  slotIndex = slotIndex.map(() => Math.floor(Math.random() * chosen.length));
+
+  document.querySelectorAll(".symbolDisplay").forEach((el, i) => {
+    el.textContent = chosen[slotIndex[i]];
+    el.classList.add("flicker");
+    setTimeout(() => el.classList.remove("flicker"), 120);
+  });
+}
+
+// =======================
+// AUDIO
+// =======================
+function playSound(id) {
+  try {
+    const a = document.getElementById(id);
+    if (a) { a.currentTime = 0; a.play().catch(() => {}); }
+  } catch {}
+}
+
+// =======================
+// INIT LEVEL
+// =======================
+function initLevel() {
+  if (window.memory) {
+    if (typeof memory.recordEvent === "function") memory.recordEvent("level_start", { level: 1 });
+    if (typeof memory.getEnvironmentalFragment === "function") {
+      document.getElementById("environmentFragment").textContent = memory.getEnvironmentalFragment();
     }
   }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.altKey && e.key === "d" && window.memory && typeof memory.showDebug === "function") memory.showDebug();
+    if (e.altKey && e.key === "r") {
+      if (confirm("Reset all memory?")) {
+        if (window.memory && typeof memory.clear === "function") memory.clear();
+        localStorage.clear();
+        location.reload();
+      }
+    }
+  });
 }
 
-function check(){
-  if(!inspected){
-    document.getElementById("result").textContent = "The door waits for understanding.";
-    return;
+window.addEventListener("DOMContentLoaded", initLevel);
+
+// =======================
+// INSPECT PUZZLE
+// =======================
+function inspect() {
+  if (inspected) return;
+
+  inspected = true;
+  playSound("clickSound");
+
+  // Pick 3 random symbols for puzzle
+  chosen = [...symbols].sort(() => 0.5 - Math.random()).slice(0, 3);
+  correctOrder = [...chosen];
+
+  if (window.memory && memory.data && memory.data.levels) {
+    memory.data.levels[1].firstSymbolOrder = [...correctOrder];
+    if (typeof memory.recordEvent === "function") memory.recordEvent("inspect");
   }
 
-  if(userSlots.includes("")){
-    document.getElementById("result").textContent = "All slots must be filled.";
-    if(wrongClick){ wrongClick.currentTime=0; wrongClick.play(); }
-    return;
-  }
+  document.getElementById("slotPuzzle").classList.add("show");
+
+  // SHOW HINT BEFORE SHUFFLE
+  showHint(4000); // show for 4 seconds
+
+  // THEN RANDOMIZE SLOT DISPLAY
+  slotIndex = [0, 1, 2]; // reset indices
+  reshuffleSymbols();     // shuffle symbols in slots
+
+  document.getElementById("result").innerHTML =
+    `<span style="color:#8b0000">›</span> The room watches you remember.`;
+
+  document.getElementById("inspectBtn").disabled = true;
+
+  if (window.memory && typeof memory.save === "function") memory.save();
+}
+
+// =======================
+// ROTATE SLOT
+// =======================
+function rotateSlot(i, dir) {
+  if (solved) return;
+
+  playSound("clickSound");
+  slotIndex[i] =
+    dir === "up"
+      ? (slotIndex[i] - 1 + chosen.length) % chosen.length
+      : (slotIndex[i] + 1) % chosen.length;
+
+  const display = document.querySelectorAll(".symbolDisplay")[i];
+  display.textContent = chosen[slotIndex[i]];
+
+  setTimeout(reshuffleSymbols, 180);
+}
+
+// =======================
+// CHECK PUZZLE
+// =======================
+function checkSlots() {
+  if (solved) return;
+
+  playSound("clickSound");
 
   let ok = true;
-  for(let i=0;i<3;i++){ if(userSlots[i]!==correctOrder[i]) ok=false; }
-
-  if(ok){
-    solved=true;
-    document.getElementById("result").innerHTML = "The lock clicks.<br><strong>You may pass.</strong>";
-    if(doorCreak){ doorCreak.play(); setTimeout(()=>doorJump.play(),600); }
-
-    // Loader to next level
-    setTimeout(()=>{
-      const loader=document.createElement("div");
-      loader.classList.add("loaderOverlay");
-      loader.innerHTML=`
-        <p>The room exhales...</p>
-        <div class="bar-container">
-          <div class="bar-fill"></div>
-          <div class="blood"></div>
-        </div>
-        <span id="percent">0%</span>`;
-      document.body.appendChild(loader);
-
-      const fill = loader.querySelector(".bar-fill");
-      const percentText = loader.querySelector("#percent");
-      let progress=0;
-      const interval = setInterval(()=>{
-        progress+=Math.floor(Math.random()*8)+3;
-        if(progress>=100) progress=100;
-        fill.style.width = progress+"%";
-        percentText.innerText = progress+"%";
-        if(progress>=100){ clearInterval(interval); window.location.href="level2.html"; }
-      },300);
-    },800);
-
-  } else {
-    document.getElementById("result").textContent = "The lock resists. Look at the wall again.";
-    if(wrongClick){ wrongClick.currentTime=0; wrongClick.play(); }
+  for (let i = 0; i < 3; i++) {
+    if (chosen[slotIndex[i]] !== correctOrder[i]) ok = false;
   }
+
+  if (ok) {
+    solved = true;
+    playSound("successSound");
+
+    localStorage.setItem("level1Solved", "true");
+    if (localStorage.getItem("level2Solved") === null) localStorage.setItem("level2Solved", "false");
+
+    document.getElementById("result").innerHTML = `
+      <span style="color:#00aa00">✓ The lock yields.</span><br>
+      <em>The room exhales.</em>
+    `;
+    document.getElementById("door").classList.add("open");
+
+    setTimeout(() => window.location.href = "level.html", 2500);
+  } else {
+    playSound("errorSound");
+    hintCorruption += 0.5;
+
+    document.body.classList.add("glitch");
+    setTimeout(() => document.body.classList.remove("glitch"), 250);
+
+    document.getElementById("result").innerHTML =
+      `<span style="color:#ff0000">✗ Wrong. The wall shifts.</span>`;
+
+    showHint(2000);
+    setTimeout(reshuffleSymbols, 250);
+  }
+
+  if (window.memory && typeof memory.save === "function") memory.save();
+}
+
+// =======================
+// DOOR INTERACTION
+// =======================
+function tryDoor() {
+  playSound("clickSound");
+  document.getElementById("result").innerHTML =
+    !inspected
+      ? `<span style="color:#8b0000">The door ignores you.</span>`
+      : `<span style="color:#8b0000">Not yet.</span>`;
+}
+
+// =======================
+// LOADING SCREEN
+// =======================
+function showLoadingScreen() {
+  document.getElementById("loadingScreen").style.display = "flex";
+  if (window.memory && typeof memory.nextLevel === "function") memory.nextLevel();
 }

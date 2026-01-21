@@ -12,7 +12,7 @@ const failSound = document.getElementById("fail");
 
 /* Start ambience */
 ambience.volume = 0.5;
-ambience.play();
+ambience.play().catch(()=>{});
 
 /* Generate non-repeating sequence */
 function generateSequence(){
@@ -24,7 +24,8 @@ function showVision(){
   const vision = document.getElementById("vision");
   vision.textContent = sequence.join(" ");
   vision.style.opacity = 1;
-  whisper.play();
+  whisper.currentTime = 0;
+  whisper.play().catch(()=>{});
 
   setTimeout(()=>{
     vision.style.opacity = 0;
@@ -34,7 +35,7 @@ function showVision(){
 /* Choose symbol */
 function choose(symbol){
   clickSound.currentTime = 0;
-  clickSound.play();
+  clickSound.play().catch(()=>{});
 
   const result = document.getElementById("result");
 
@@ -67,7 +68,9 @@ function markUsed(symbol){
 
 /* Failure */
 function fail(){
-  failSound.play();
+  failSound.currentTime = 0;
+  failSound.play().catch(()=>{});
+
   document.body.classList.add("shake");
   document.getElementById("result").textContent =
     "Wrong. The witnesses turn away.";
@@ -86,10 +89,21 @@ function reset(){
   showVision();
 }
 
-/* Win + Loading */
+/* ✅ WIN — FIXED */
 function win(){
   document.getElementById("result").innerHTML =
     "The hall opens.<br><strong>You may pass.</strong>";
+
+  // ✅ MARK LEVEL 2 AS SOLVED
+  localStorage.setItem("level2Solved", "true");
+
+  // ✅ PREPARE LEVEL 3
+  if (localStorage.getItem("level3Solved") === null) {
+    localStorage.setItem("level3Solved", "false");
+  }
+
+  // Optional progression tracking
+  localStorage.setItem("currentLevel", "2");
 
   setTimeout(showLoader,1200);
 }
@@ -125,7 +139,7 @@ function showLoader(){
     percent.textContent = p+"%";
     if(p===100){
       clearInterval(interval);
-      window.location.href="level3.html";
+      window.location.href="level.html";
     }
   },300);
 }

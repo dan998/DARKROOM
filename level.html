@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Haunted Levels</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css?family=Finger+Paint" rel="stylesheet">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:black; font-family:"Finger Paint", cursive; }
+
+/* BACKGROUND IMAGE LAYER */
+#bg {
+  position: fixed;
+  inset: 0;
+  background: black;
+  background-size: cover;
+  background-position: center;
+  z-index: -3;
+  filter: blur(2px);
+  transition: background-image 0.5s ease;
+}
+
+/* THREE.JS CANVAS */
+#myCanvas { position: fixed; inset:0; z-index:-2; }
+
+/* ===== LEVEL UI ===== */
+.levels-section {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  padding: 20px;
+}
+.levels-title {
+  color:#ddd; font-size:6vw; letter-spacing:0.5vw; margin-bottom:4vh;
+  text-shadow:0 0 2vw rgba(255,255,255,0.4); text-align:center;
+}
+.levels-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 2vw;
+  width: 90%;
+  max-width: 500px;
+}
+.level {
+  aspect-ratio: 1;
+  background:rgba(0,0,0,0.65);
+  border:2px solid rgba(255,255,255,0.25);
+  color:#999; display:flex; align-items:center; justify-content:center;
+  font-size:4vw; cursor:pointer;
+  box-shadow:inset 0 0 2vw rgba(0,0,0,0.9);
+  transition:0.3s ease;
+  border-radius: 10%;
+}
+.level.unlocked {
+  color:white; border-color:white;
+  box-shadow:0 0 1vw rgba(255,255,255,0.5);
+}
+.level.unlocked:hover {
+  transform:scale(1.1);
+  box-shadow:0 0 2vw rgba(255,255,255,0.9);
+}
+.level.locked { opacity:0.3; cursor:not-allowed; }
+.level.final { border-color:crimson; color:crimson; text-shadow:0 0 0.5vw crimson; }
+
+/* SOUND TOGGLE */
+#soundToggle { position:fixed; bottom:2vh; right:2vw; color:#ccc; cursor:pointer; font-size:4vw; opacity:0.7; }
+
+@media (max-width: 600px){
+  .levels-title { font-size:8vw; letter-spacing:0.3vw; }
+  .level { font-size:6vw; }
+  #soundToggle { font-size:6vw; }
+}
+</style>
+</head>
+
+<body>
+<div id="bg"></div>
+<canvas id="myCanvas"></canvas>
+
+<section class="levels-section">
+  <h1 class="levels-title">THE ROOMS</h1>
+  <div class="levels-grid">
+    <div class="level" data-level="1">01</div>
+    <div class="level" data-level="2">02</div>
+    <div class="level" data-level="3">03</div>
+    <div class="level" data-level="4">04</div>
+    <div class="level" data-level="5">05</div>
+    <div class="level" data-level="6">06</div>
+    <div class="level" data-level="7">07</div>
+    <div class="level" data-level="8">08</div>
+    <div class="level" data-level="9">09</div>
+    <div class="level" data-level="10">10</div>
+    <div class="level" data-level="11">11</div>
+    <div class="level" data-level="12">12</div>
+    <div class="level" data-level="13">13</div>
+    <div class="level" data-level="14">14</div>
+    <div class="level" data-level="15">15</div>
+    <div class="level final" data-level="16">16</div>
+  </div>
+</section>
+
+<div id="soundToggle">🔊</div>
+
+<!-- LOCAL AUDIO -->
+<audio id="ambient" loop>
+  <source src="audio/ambient.mp3" type="audio/mpeg">
+</audio>
+<audio id="hoverSound">
+  <source src="audio/hover.mp3" type="audio/mpeg">
+</audio>
+<audio id="clickSound">
+  <source src="audio/click.mp3" type="audio/mpeg">
+</audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ===== SOUND =====
+const ambient = document.getElementById("ambient");
+const hoverSound = document.getElementById("hoverSound");
+const clickSound = document.getElementById("clickSound");
+const toggle = document.getElementById("soundToggle");
+let muted = localStorage.getItem("muted")==="1";
+ambient.volume=0.35;
+function syncSound(){
+  if(muted){ ambient.pause(); toggle.textContent="🔇"; }
+  else{ ambient.play().catch(()=>{}); toggle.textContent="🔊"; }
+}
+syncSound();
+toggle.onclick=()=>{ muted=!muted; localStorage.setItem("muted",muted?"1":"0"); syncSound(); };
+
+// ===== LEVEL MEMORY =====
+const TOTAL_LEVELS = 16;
+for(let i=1;i<=TOTAL_LEVELS;i++){
+  if(localStorage.getItem(`level${i}Solved`)===null){
+    localStorage.setItem(`level${i}Solved`,i===1?"true":"false");
+  }
+}
+function getCurrentLevel(){
+  for(let i=TOTAL_LEVELS;i>=1;i--){
+    if(localStorage.getItem(`level${i}Solved`)==="true") return i;
+  }
+  return 1;
+}
+function syncLevels(){
+  const currentLevel=getCurrentLevel();
+  document.querySelectorAll(".level").forEach(level=>{
+    const lvl=parseInt(level.dataset.level);
+    if(lvl<=currentLevel+1){ level.classList.add("unlocked"); level.classList.remove("locked"); }
+    else{ level.classList.add("locked"); level.classList.remove("unlocked"); }
+  });
+}
+syncLevels();
+
+// ===== DYNAMIC BACKGROUND =====
+const bg = document.getElementById("bg");
+const currentLevel = localStorage.getItem("currentLevel") || 1;
+bg.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('images/room${currentLevel}.jpg')`;
+bg.style.backgroundSize = 'cover';
+bg.style.backgroundPosition = 'center';
+
+// ===== LEVEL INTERACTION =====
+document.querySelectorAll(".level").forEach(level=>{
+  const lvl=parseInt(level.dataset.level);
+  level.addEventListener("mouseenter",()=>{
+    if(!muted && level.classList.contains("unlocked")){
+      hoverSound.currentTime=0; hoverSound.play().catch(()=>{});
+    }
+  });
+  level.addEventListener("click",()=>{
+    if(!level.classList.contains("unlocked")) return;
+    if(!muted){ clickSound.currentTime=0; clickSound.play().catch(()=>{}); }
+    localStorage.setItem("currentLevel", lvl);
+    setTimeout(()=>{ window.location.href=`level${lvl}.html`; },400);
+  });
+});
+
+// ===== THREE.JS SMOKE =====
+let camera, scene, renderer, clock, smokeParticles=[];
+clock = new THREE.Clock();
+renderer = new THREE.WebGLRenderer({canvas:document.getElementById("myCanvas"), alpha:true});
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+scene = new THREE.Scene();
+camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight,1,5000);
+camera.position.z = 1000; scene.add(camera);
+const light = new THREE.DirectionalLight(0xffffff,0.6);
+light.position.set(-1,0,1); scene.add(light);
+const smokeTexture = new THREE.TextureLoader().load("images/smoke.png");
+const smokeMaterial = new THREE.MeshLambertMaterial({map:smokeTexture,transparent:true});
+const smokeGeo = new THREE.PlaneGeometry(300,300);
+for(let i=0;i<150;i++){
+  const smoke=new THREE.Mesh(smokeGeo,smokeMaterial);
+  smoke.position.set(Math.random()*600-300,Math.random()*600-300,Math.random()*1000-100);
+  smoke.rotation.z=Math.random()*Math.PI;
+  scene.add(smoke); smokeParticles.push(smoke);
+}
+function animate(){
+  requestAnimationFrame(animate);
+  const delta = clock.getDelta();
+  smokeParticles.forEach(p => p.rotation.z += delta*0.2);
+  renderer.render(scene,camera);
+}
+animate();
+window.addEventListener("resize",()=>{
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

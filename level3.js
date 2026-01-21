@@ -4,6 +4,7 @@ let trueSequence = [];
 let progress = 0;
 let used = new Set();
 let listening = true;
+let illusionInterval = null;
 
 /* Sounds */
 const ambience = document.getElementById("ambience");
@@ -16,7 +17,7 @@ const failSound = document.getElementById("fail");
 
 /* Start ambience */
 ambience.volume = 0.5;
-ambience.play();
+ambience.play().catch(()=>{});
 
 /* Generate real sequence */
 function generateSequence(){
@@ -26,7 +27,10 @@ function generateSequence(){
 /* Fake visual illusion */
 function startIllusion(){
   const illusion = document.getElementById("illusion");
-  setInterval(()=>{
+
+  if (illusionInterval) clearInterval(illusionInterval);
+
+  illusionInterval = setInterval(()=>{
     illusion.textContent =
       symbols.sort(()=>0.5-Math.random()).slice(0,3).join(" ");
   },350);
@@ -35,6 +39,8 @@ function startIllusion(){
 /* Play whisper sequence */
 function playWhispers(){
   let i = 0;
+  listening = true;
+
   function playNext(){
     if(i >= trueSequence.length){
       listening = false;
@@ -42,10 +48,14 @@ function playWhispers(){
         "The echoes fade. Now choose.";
       return;
     }
-    whispers[i].play();
+
+    whispers[i].currentTime = 0;
+    whispers[i].play().catch(()=>{});
     i++;
+
     setTimeout(playNext,1400);
   }
+
   playNext();
 }
 
@@ -85,7 +95,9 @@ function markUsed(symbol){
 
 /* Fail */
 function fail(msg){
-  failSound.play();
+  failSound.currentTime = 0;
+  failSound.play().catch(()=>{});
+
   document.body.classList.add("shake");
   document.getElementById("result").textContent = msg;
 
@@ -100,14 +112,29 @@ function reset(){
   progress = 0;
   used.clear();
   listening = true;
+
   document.querySelectorAll("button").forEach(b=>b.classList.remove("used"));
   playWhispers();
 }
 
-/* Win */
+/* ✅ WIN — PROGRESSION FIX */
 function win(){
   document.getElementById("result").innerHTML =
     "The chamber falls silent.<br><strong>You endured.</strong>";
+
+  /* ✅ MARK THIS LEVEL SOLVED */
+  localStorage.setItem("level3Solved", "true");
+
+  /* ✅ UNLOCK NEXT LEVEL */
+  if (localStorage.getItem("level4Solved") === null) {
+    localStorage.setItem("level4Solved", "false");
+  }
+
+  /* Optional tracking */
+  localStorage.setItem("currentLevel", "3");
+
+  clearInterval(illusionInterval);
+
   setTimeout(showLoader,1200);
 }
 
@@ -140,9 +167,10 @@ function showLoader(){
     if(p>=100) p=100;
     bar.style.width = p+"%";
     percent.textContent = p+"%";
+
     if(p===100){
       clearInterval(interval);
-      window.location.href="level4.html";
+      window.location.href="level.html";
     }
   },300);
 }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HUNTED – Level One</title>
+  <link rel="stylesheet" href="level1.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg bg1"></div>
+  <div class="bg bg2"></div>
+  <div class="overlay"></div>
+
+  <!-- Environmental Fragment (added via JS) -->
+  <div id="environmentFragment" class="fragment"></div>
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="loading-screen" style="display:none;">
+    <div class="loading-text" id="loadingText">Processing behavior...</div>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+    <div class="loading-hint" id="loadingHint"></div>
+    <div class="loading-sub" id="loadingSub"></div>
+  </div>
+
+  <div class="level">
+    <h1 id="levelTitle">LEVEL ONE</h1>
+
+    <p class="story" id="story">
+      The door closed behind you.<br>
+      The air feels wrong.<br>
+      Something watches.
+    </p>
+
+    <div class="choices">
+      <button onclick="inspect()" id="inspectBtn">Inspect the room</button>
+      <button onclick="tryDoor()">Try the door</button>
+      <button onclick="memory.showDebug()" class="debug-btn" style="opacity:0.3;">[debug]</button>
+    </div>
+
+    <!-- Slot Puzzle -->
+    <div class="slotPuzzle" id="slotPuzzle">
+      <div class="slots">
+        <div class="slot">
+          <button onclick="rotateSlot(0,'up')">▲</button>
+          <div class="symbolDisplay" id="symbol0">?</div>
+          <button onclick="rotateSlot(0,'down')">▼</button>
+        </div>
+        <div class="slot">
+          <button onclick="rotateSlot(1,'up')">▲</button>
+          <div class="symbolDisplay" id="symbol1">?</div>
+          <button onclick="rotateSlot(1,'down')">▼</button>
+        </div>
+        <div class="slot">
+          <button onclick="rotateSlot(2,'up')">▲</button>
+          <div class="symbolDisplay" id="symbol2">?</div>
+          <button onclick="rotateSlot(2,'down')">▼</button>
+        </div>
+      </div>
+
+      <button onclick="checkSlots()" id="checkBtn">Check Symbols</button>
+      <div class="attempt-counter" id="attemptCounter"></div>
+    </div>
+
+    <p id="result" class="result"></p>
+
+    <!-- Door -->
+    <div class="door" id="door">
+      <div class="door-panel left"></div>
+      <div class="door-panel right"></div>
+      <div class="door-number">I</div>
+    </div>
+
+    <!-- Hidden Audio Elements -->
+    <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/273/273-preview.mp3" preload="auto"></audio>
+    <audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/274/274-preview.mp3" preload="auto"></audio>
+    <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/276/276-preview.mp3" preload="auto"></audio>
+  </div>
+
+  <script src="memory.js"></script>
+  <script src="level1.js"></script>
+</body>
+</html>

@@ -65,7 +65,7 @@ function startGame() {
       doorNoise.play();
 
       setTimeout(() => {
-        window.location.href = "game.html";
+        window.location.href = "level.html";
       }, 800);
     }
   }, 300);

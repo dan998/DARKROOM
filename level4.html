@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HUNTED – Level Four</title>
+  <link rel="stylesheet" href="level4.css">
+</head>
+<body>
+
+<audio id="ambient" src="sounds/ambient.mp3" loop></audio>
+<audio id="inspectSnd" src="sounds/inspect.mp3"></audio>
+<audio id="correctSnd" src="sounds/correct.mp3"></audio>
+<audio id="wrongSnd" src="sounds/wrong.mp3"></audio>
+
+<div class="bg"></div>
+<div class="fog"></div>
+
+<div class="room">
+  <h1>LEVEL FOUR</h1>
+
+  <p id="story">
+    This chamber waits.<br>
+    Not for touch — but for truth.<br>
+    The wall remembers what the mouth forgets.
+  </p>
+
+  <button id="inspectBtn">Inspect Room</button>
+
+  <!-- Hidden Wall Symbols -->
+  <div id="wall" class="wall hidden">
+    <span>☪️</span>
+    <span>☯️</span>
+    <span>✡️</span>
+  </div>
+
+  <!-- Slots -->
+  <div class="slots">
+    <div class="slot">?</div>
+    <div class="slot">?</div>
+    <div class="slot">?</div>
+  </div>
+
+  <!-- Choices -->
+  <div class="symbols">
+    <button onclick="pick('☪️')">☪️</button>
+    <button onclick="pick('✡️')">✡️</button>
+    <button onclick="pick('☯️')">☯️</button>
+    <button onclick="pick('🕎')">🕎</button>
+  </div>
+
+  <button id="doorBtn">Approach the Door</button>
+
+  <p id="result"></p>
+
+  <!-- Loader -->
+  <div id="loader" class="loader hidden">
+    <div class="bar"><div class="fill"></div></div>
+    <span id="percent">0%</span>
+  </div>
+</div>
+
+<script src="level4.js"></script>
+</body>
+</html>
